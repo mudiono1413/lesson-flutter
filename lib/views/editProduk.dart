@@ -92,7 +92,7 @@ class _EditProdukState extends State < EditProduk> {
               decoration: InputDecoration(labelText: "Quantity"
               ),
             ),
-            TextFormField(controller: txtQty,
+            TextFormField(controller: txtHarga,
               onSaved: (e)=> harga=e,
               decoration: InputDecoration(labelText: "Harga"
 

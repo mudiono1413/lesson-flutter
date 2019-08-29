@@ -1,101 +1,160 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
+import 'package:http/http.dart'as http;
+import 'package:intl/intl.dart';
+import 'package:lesson_flutter/custom/curency.dart';
+// import 'package:lesson_flutter/custom/datePicker.dart';
 import 'package:lesson_flutter/modal/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart'as path;
+
 
 class TambahProduk extends StatefulWidget {
   final VoidCallback reload;
   TambahProduk(this.reload);
-  @override
-  _TambahProdukState createState() => _TambahProdukState();
+  @override _TambahProdukState createState()=>_TambahProdukState();
 }
 
 class _TambahProdukState extends State<TambahProduk> {
-  String namaProduk, qty, harga, idUsers;
-  final _key = new GlobalKey<FormState>();
+  String namaProduk,
+  qty,
+  harga,
+  idUsers;
+  final _key=new GlobalKey<FormState>();
+  File _imageFile;
 
-  getPref() async{
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+  getPref() async {
+    SharedPreferences preferences=await SharedPreferences.getInstance();
+
     setState(() {
-     idUsers = preferences.getString("id"); 
-    });
+        idUsers=preferences.getString("id");
+      }
+
+    );
   }
 
-check(){
-  final form = _key.currentState;
-  if (form.validate()) {
-    form.save();
-    submit();
-  }
-}
+  _pilihGalery() async {
+    var image=await ImagePicker.pickImage(source: ImageSource.gallery,
+      maxHeight: 1920.0,
+      maxWidth: 1800.0);
 
-submit() async{
-  final response = await http.post(BaseUrl().tambahProduk, body:{
-      "namaProduk" : namaProduk,
-      "qty" : qty,
-      "harga" : harga,
-      "idUsers" : idUsers
-
-  } );
-  final data = jsonDecode(response.body);
-  int value = data['value'];
-  String pesan = data['messege'];
-  if (value==1) {
-    print(pesan);
     setState(() {
-      widget.reload;
-     Navigator.pop(context); 
-    });
-  }else{
-    print(pesan);  
-  }
-}
+        _imageFile=image;
+      }
 
-@override
-  void initState() {
+    );
+  }
+
+  _pilihCamera()async {
+    var image=await ImagePicker.pickImage(source: ImageSource.camera,
+      maxHeight: 1920.0,
+      maxWidth: 1800.0);
+
+    setState(() {
+        _imageFile=image;
+      }
+
+    );
+  }
+
+  check() {
+    final form=_key.currentState;
+
+    if (form.validate()) {
+      form.save();
+      submit();
+    }
+  }
+
+  submit() async {
+    try {
+      var stream=http.ByteStream(DelegatingStream.typed(_imageFile.openRead()));
+      var length=await _imageFile.length();
+      var uri=Uri.parse(BaseUrl().tambahProduk);
+      var request=http.MultipartRequest("POST", uri);
+      request.fields['namaProduk']=namaProduk;
+      request.fields['qty']=qty;
+      request.fields['harga']=harga.replaceAll(",", '');
+      request.fields['idUsers']=idUsers;
+      
+      request.files.add(http.MultipartFile("image", stream, length,
+          filename: path.basename(_imageFile.path)));
+    var response = await request.send();
+    if (response.statusCode > 2) {
+      print("image upload");
+      setState(() {
+       widget.reload; 
+       Navigator.pop(context);
+      });
+    } else {
+      print("image failed");
+    }
+
+    }
+
+    catch (e) {
+      debugPrint("Error" +e);
+    }
+
+    
+  }
+
+  @override void initState() {
     // TODO: implement initState
     super.initState();
     getPref();
   }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Form(
-        key:  _key,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(
-          children: <Widget>[
-            TextFormField(
-                onSaved: (e)=>namaProduk = e,
-                  decoration: InputDecoration(
-                    labelText: "Nama Produk"
-                  ),
-            ),
-             TextFormField(
-                onSaved: (e)=>qty = e,
-                  decoration: InputDecoration(
-                    labelText: "Quantity"
-                  ),
-            ),
-             TextFormField(
-                onSaved: (e)=>harga = e,
-                  decoration: InputDecoration(
-                    labelText: "Harga"
-                  ),
-            ),
-            MaterialButton(
-                onPressed: (){
-                    check();
-                },
-                child: Text("Simpan"),
-            )
-          ],
-        ),
+
+  @override Widget build(BuildContext context) {
+    var placeholder=Container(width: double.infinity,
+      height: 150.0,
+      child: Image.asset('./img/placeholder.jpg'),
+    );
+
+    return Scaffold(appBar: AppBar(),
+      body: Form(key: _key,
+        child: Padding(padding: const EdgeInsets.all(16.0),
+          child: ListView(children: <Widget>[ Container(width: double.infinity,
+              height: 150.0,
+              child: InkWell(onTap: () {
+                  _pilihCamera();
+                }
+
+                ,
+                child: _imageFile==null ? placeholder : Image.file(_imageFile,
+                  fit: BoxFit.fill,
+                ),
               ),
+            ),
+            TextFormField(onSaved: (e)=>namaProduk=e,
+              decoration: InputDecoration(labelText: "Nama Produk"
+              ),
+            ),
+            TextFormField(onSaved: (e)=>qty=e,
+              decoration: InputDecoration(labelText: "Quantity"
+              ),
+            ),
+            TextFormField(inputFormatters: [ WhitelistingTextInputFormatter.digitsOnly,
+              CurencyFormat()],
+              onSaved: (e)=>harga=e,
+              decoration: InputDecoration(labelText: "Harga"
+
+              ),
+            ),
+            MaterialButton(onPressed: () {
+                check();
+              }
+
+              ,
+              child: Text("Simpan"),
+            )],
+          ),
+        ),
       ),
     );
   }

@@ -5,8 +5,8 @@ import 'package:lesson_flutter/modal/api.dart';
 import 'package:lesson_flutter/modal/produkModel.dart';
 import 'package:lesson_flutter/views/editProduk.dart';
 import 'package:lesson_flutter/views/tambahProduk.dart';
-import 'package:http/http.dart'
-as http;
+import 'package:http/http.dart'as http;
+import 'package:intl/intl.dart';
 
 class Product extends StatefulWidget {
 
@@ -14,6 +14,8 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State < Product> {
+  final money=NumberFormat("#,###", "en_US");
+
   var loading=false;
   final list=new List < ProdukModel>();
   final GlobalKey < RefreshIndicatorState>_refresh=GlobalKey < RefreshIndicatorState>();
@@ -41,6 +43,7 @@ class _ProductState extends State < Product> {
             api['harga'],
             api['createdDate'],
             api['idUsers'],
+            api['image'],
             api['nama']);
           list.add(ab);
         }
@@ -59,31 +62,29 @@ class _ProductState extends State < Product> {
 
     showDialog(context: context,
       builder: (context) {
+
         return Dialog(child: ListView(padding: EdgeInsets.all(16.0),
             shrinkWrap: true,
             children: <Widget>[ Text("Are you sure want to delete data ?",
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold), ),
             SizedBox(height: 10.0,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[ 
-              InkWell(
-                onTap: (){
+            Row(mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[ InkWell(onTap: () {
                   _delete(id);
 
-                },
+                }
+
+                ,
                 child: Text("Yes")),
-              SizedBox(
-                  width: 16.0,
+              SizedBox(width: 16.0,
               ),
-              InkWell(
-                onTap: (){
+              InkWell(onTap: () {
                   Navigator.pop(context);
-                } ,
-                child: Text("No")
-                )
-              ],
+                }
+
+                ,
+                child: Text("No"))],
             ),
             ],
           ),
@@ -138,12 +139,26 @@ class _ProductState extends State < Product> {
           itemBuilder: (context, i) {
             final x=list[i];
             return Padding(padding: const EdgeInsets.all(10.0),
-              child: Container(child: Row(children: < Widget > [ Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                      children: < Widget > [ Text(x.namaProduk,
+              child: Container(child: Row(
+                children: < Widget > [
+                  Image.network(
+                          'http://192.168.1.8/lesson_flutter/upload/'+ x.image,
+                          width: 100.0,
+                          height: 180.0,
+                          fit: BoxFit.cover,
+                        ),
+                        SizedBox(
+                          width: 10.0,
+                        ),
+                   Expanded(
+                     child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                      children: < Widget > [
+                         Text(x.namaProduk,
                         style: TextStyle(fontSize: 18.0,
                           fontWeight: FontWeight.bold), ),
                       Text(x.qty),
-                      Text(x.harga),
+                      Text(money.format(int.parse(x.harga))),
                       Text(x.nama),
                       Text(x.createdDate),
 
