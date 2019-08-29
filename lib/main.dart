@@ -58,10 +58,11 @@ class _LoginState extends State<Login> {
     String pesan = data['messege'];
     String usernameAPI = data['username'];
     String namaAPI = data['nama'];
+    String IdAPI = data['id'];
     if (value==1) {
       setState(() {
          _loginStatus = LoginStatus.signIn;
-         savePref(value, usernameAPI, namaAPI);
+         savePref(value, usernameAPI, namaAPI,IdAPI);
       });
       print(pesan);
     } else {
@@ -70,13 +71,13 @@ class _LoginState extends State<Login> {
  
   }
 
-  savePref(int value, String username, String nama) async{
+  savePref(int value, String username, String nama, String id) async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
      preferences.setInt("value", value) ;
      preferences.setString("nama", nama);
      preferences.setString("username", username);
-    //  preferences.setString("id", id);
+     preferences.setString("id", id);
      preferences.commit();
     });
   }
