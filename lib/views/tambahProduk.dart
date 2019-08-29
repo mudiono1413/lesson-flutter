@@ -6,6 +6,8 @@ import 'package:lesson_flutter/modal/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TambahProduk extends StatefulWidget {
+  final VoidCallback reload;
+  TambahProduk(this.reload);
   @override
   _TambahProdukState createState() => _TambahProdukState();
 }
@@ -43,6 +45,7 @@ submit() async{
   if (value==1) {
     print(pesan);
     setState(() {
+      widget.reload;
      Navigator.pop(context); 
     });
   }else{
