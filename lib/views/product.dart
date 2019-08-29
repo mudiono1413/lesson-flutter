@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:lesson_flutter/modal/api.dart';
 import 'package:lesson_flutter/modal/produkModel.dart';
+import 'package:lesson_flutter/views/editProduk.dart';
 import 'package:lesson_flutter/views/tambahProduk.dart';
 import 'package:http/http.dart' as http;
 
 class Product extends StatefulWidget {
+
   @override
   _ProductState createState() => _ProductState();
 }
@@ -93,7 +95,10 @@ class _ProductState extends State<Product> {
                      ),
                        ),
                        IconButton(
-                         onPressed: (){},
+                         onPressed: (){
+                           Navigator.of(context).push(MaterialPageRoute(
+                             builder: (context)=> EditProduk(x, _lihatData)));
+                         },
                          icon: Icon(Icons.edit),
                        ),
                        IconButton(
