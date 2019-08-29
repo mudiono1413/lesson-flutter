@@ -37,7 +37,8 @@ class _ProductState extends State < Product> {
 
       data.forEach((api) {
 
-          final ab=new ProdukModel(api['id'],
+          final ab=new ProdukModel(
+            api['id'],
             api['namaProduk'],
             api['qty'],
             api['harga'],
@@ -125,11 +126,11 @@ class _ProductState extends State < Product> {
   }
 
   @override Widget build(BuildContext context) {
-    return Scaffold(floatingActionButton: FloatingActionButton(onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TambahProduk(_lihatData)));
-        }
-
-        ,
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context)=> TambahProduk(_lihatData)));
+        },
         child: Icon(Icons.add),
 
       ),
@@ -138,11 +139,13 @@ class _ProductState extends State < Product> {
         child: loading ? Center(child: CircularProgressIndicator()) : ListView.builder(itemCount: list.length,
           itemBuilder: (context, i) {
             final x=list[i];
-            return Padding(padding: const EdgeInsets.all(10.0),
-              child: Container(child: Row(
+            return Container(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                child: Row(
                 children: < Widget > [
                   Image.network(
-                          'http://192.168.1.8/lesson_flutter/upload/'+ x.image,
+                          'http://192.168.1.128/lesson_flutter/upload/'+ x.image,
                           width: 100.0,
                           height: 180.0,
                           fit: BoxFit.cover,

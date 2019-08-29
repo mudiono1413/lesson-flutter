@@ -5,8 +5,9 @@ class ProdukModel{
   final String harga;
   final String createdDate;
   final String idUsers;
-  final String nama;
   final String image;
+  final String nama;
+
 
   ProdukModel(
     this.id, 
@@ -15,8 +16,8 @@ class ProdukModel{
     this.harga, 
     this.createdDate, 
     this.idUsers, 
-    this.nama,
-    this.image)
+    this.image,
+    this.nama)
     ;
 
 }
