@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart'as http;
 import 'package:intl/intl.dart';
 import 'package:lesson_flutter/custom/curency.dart';
+import 'package:lesson_flutter/custom/datePicker.dart';
 // import 'package:lesson_flutter/custom/datePicker.dart';
 import 'package:lesson_flutter/modal/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -81,6 +82,7 @@ class _TambahProdukState extends State<TambahProduk> {
       request.fields['qty']=qty;
       request.fields['harga']=harga.replaceAll(",", '');
       request.fields['idUsers']=idUsers;
+      request.fields['expDate']="$tgl";
       
       request.files.add(http.MultipartFile("image", stream, length,
           filename: path.basename(_imageFile.path)));
@@ -100,8 +102,28 @@ class _TambahProdukState extends State<TambahProduk> {
     catch (e) {
       debugPrint("Error" +e);
     }
+  }
 
-    
+  String piligTanggal, labelText;
+
+  DateTime tgl = new DateTime.now();
+
+  final TextStyle valueStyle = TextStyle(fontSize:  16.0);
+  Future<Null> _selectedDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context:  context,
+      initialDate: tgl,
+      firstDate: DateTime(1992),
+      lastDate: DateTime(2099)
+    );
+    if (picked !=null && picked !=tgl) {
+      setState(() {
+       tgl = picked; 
+       piligTanggal = new DateFormat.yMd().format(tgl);
+      });
+    }else{
+
+    }
   }
 
   @override void initState() {
@@ -143,8 +165,15 @@ class _TambahProdukState extends State<TambahProduk> {
               CurencyFormat()],
               onSaved: (e)=>harga=e,
               decoration: InputDecoration(labelText: "Harga"
-
               ),
+            ),
+            DateDropDown(
+                labelText:  labelText,
+                valueText: new DateFormat.yMd().format(tgl),
+                valueStyle: valueStyle,
+                onPressed: (){
+                  _selectedDate(context);
+                },
             ),
             MaterialButton(onPressed: () {
                 check();

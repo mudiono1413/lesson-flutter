@@ -145,9 +145,9 @@ class _ProductState extends State < Product> {
                 child: Row(
                 children: < Widget > [
                   Image.network(
-                          'http://192.168.1.128/lesson_flutter/upload/'+ x.image,
+                          'http://192.168.1.121/lesson_flutter/upload/'+ x.image,
                           width: 100.0,
-                          height: 180.0,
+                          height: 100.0,
                           fit: BoxFit.cover,
                         ),
                         SizedBox(

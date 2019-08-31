@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
 import 'package:lesson_flutter/modal/api.dart';
 import 'package:lesson_flutter/views/home.dart';
+import 'package:lesson_flutter/views/menuUsert.dart';
 import 'package:lesson_flutter/views/product.dart';
 import 'package:lesson_flutter/views/profile.dart';
 import 'package:lesson_flutter/views/users.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(MaterialApp(home: Login(),
+  runApp(MaterialApp(
+    home: Login(),
     ));
 }
 
@@ -20,7 +22,8 @@ class Login extends StatefulWidget {
 
 enum LoginStatus {
   notSignIn,
-  signIn
+  signIn,
+  signInUser
 }
 
 class _LoginState extends State<Login> {
@@ -62,14 +65,24 @@ var _autovalidate = false;
     String pesan=data['messege'];
     String usernameAPI=data['username'];
     String namaAPI=data['nama'];
-    String IdAPI=data['id'];
+    String idAPI=data['id'];
+    String level = data['level'];
+    
 
     if (value==1) {
-      setState(() {
-          _loginStatus=LoginStatus.signIn;
-          savePref(value, usernameAPI, namaAPI, IdAPI);
+
+      if (level == "1") {
+        setState(() {
+         _loginStatus = LoginStatus.signIn;
+            savePref(value, usernameAPI, namaAPI, idAPI,level);
+        });
+      } else {
+        setState(() {
+          _loginStatus=LoginStatus.signInUser;
+          savePref(value, usernameAPI, namaAPI, idAPI,level);
         }
       );
+      }
       print(pesan);
     }
 
@@ -78,7 +91,7 @@ var _autovalidate = false;
     }
   }
 
-  savePref(int value, String username, String nama, String id) async {
+  savePref(int value, String username, String nama, String id,String level) async {
     SharedPreferences preferences=await SharedPreferences.getInstance();
 
     setState(() {
@@ -86,6 +99,7 @@ var _autovalidate = false;
         preferences.setString("nama", nama);
         preferences.setString("username", username);
         preferences.setString("id", id);
+        preferences.setString("level", level);
         preferences.commit();
       }
     );
@@ -98,9 +112,11 @@ var _autovalidate = false;
     SharedPreferences preferences=await SharedPreferences.getInstance();
 
     setState(() {
-        value=preferences.getInt("value");
+        value=preferences.getString("level");
 
-        _loginStatus=value==1 ? LoginStatus.signIn : LoginStatus.notSignIn;
+        _loginStatus = value== "1" ? LoginStatus.signIn 
+        : value == "2" ? LoginStatus.signInUser : 
+         LoginStatus.notSignIn;
       }
 
     );
@@ -111,6 +127,7 @@ var _autovalidate = false;
 
     setState(() {
         preferences.setInt("value", null);
+        preferences.setString("level", null);
         preferences.commit();
         _loginStatus=LoginStatus.notSignIn;
       }
@@ -177,7 +194,10 @@ var _autovalidate = false;
       break;
       case LoginStatus.signIn: return MainMenu(signOut);
       break;
-      default:
+      case LoginStatus.signInUser:
+      return MenuUsers(signOut);
+      break;
+    
     }
 
   }
@@ -344,7 +364,6 @@ var validate = true;
                 return "Please insert username";
               }
             }
-
             ,
             onSaved: (e)=>username=e,
             decoration: InputDecoration(labelText: "Username"
@@ -367,7 +386,6 @@ var validate = true;
           MaterialButton(onPressed: () {
               check();
             }
-
             ,
             child: Text("Register"),
           )],
