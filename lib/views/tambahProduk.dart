@@ -107,6 +107,7 @@ class _TambahProdukState extends State<TambahProduk> {
   String piligTanggal, labelText;
 
   DateTime tgl = new DateTime.now();
+   var formatTgl = new DateFormat('yyyy-MM-dd');
 
   final TextStyle valueStyle = TextStyle(fontSize:  16.0);
   Future<Null> _selectedDate(BuildContext context) async {
@@ -119,7 +120,7 @@ class _TambahProdukState extends State<TambahProduk> {
     if (picked !=null && picked !=tgl) {
       setState(() {
        tgl = picked; 
-       piligTanggal = new DateFormat.yMd().format(tgl);
+       piligTanggal = formatTgl.format(tgl);
       });
     }else{
 
@@ -169,7 +170,7 @@ class _TambahProdukState extends State<TambahProduk> {
             ),
             DateDropDown(
                 labelText:  labelText,
-                valueText: new DateFormat.yMd().format(tgl),
+                valueText: formatTgl.format(tgl),
                 valueStyle: valueStyle,
                 onPressed: (){
                   _selectedDate(context);

@@ -45,7 +45,8 @@ class _ProductState extends State < Product> {
             api['createdDate'],
             api['idUsers'],
             api['image'],
-            api['nama']);
+            api['nama'],
+            api['ExpDate']);
           list.add(ab);
         }
 
@@ -145,7 +146,7 @@ class _ProductState extends State < Product> {
                 child: Row(
                 children: < Widget > [
                   Image.network(
-                          'http://192.168.1.121/lesson_flutter/upload/'+ x.image,
+                          'http://192.168.3.96/lesson_flutter/upload/'+ x.image,
                           width: 100.0,
                           height: 100.0,
                           fit: BoxFit.cover,
@@ -164,6 +165,7 @@ class _ProductState extends State < Product> {
                       Text(money.format(int.parse(x.harga))),
                       Text(x.nama),
                       Text(x.createdDate),
+                      Text(x.expDate)
 
                       ],
                     ),
